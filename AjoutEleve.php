@@ -373,7 +373,7 @@
             <h4><i class="fa fa-angle-right"></i> Ajouter un Eleve</h4>
             <div class="form-panel">
               <div class="form">
-                <form class="cmxform form-horizontal style-form" id="signupForm" method="post" action="AjoutAdmin.php" enctype="multipart/form-data">
+                <form class="cmxform form-horizontal style-form" id="signupForm" method="post" action="AjoutEleve.php" enctype="multipart/form-data">
                   <div class="form-group ">
                     <label for="firstname" class="control-label col-lg-2">Prenom eleve</label>
                     <div class="col-lg-10">
@@ -414,7 +414,7 @@
                     </div>
                   </div>
 
-                  <select class="form-control">
+                  <select class="form-control" name="regime">
                   <option>-----CHOISIR REGIME-----</option>
                   <option>INTERNAT</option>
                   <option>EXTERNAT</option>
@@ -425,7 +425,7 @@
                   <div class="form-group ">
                     <label for="newsletter" class="control-label col-lg-2 col-sm-3"> </label>
                     <div class="col-lg-10 col-sm-9">
-                      <input type="checkbox" style="width: 20px" class="checkbox form-control" id="newsletter" name="newsletter" />
+                      <input type="checkbox" style="width: 20px" class="checkbox form-control" id="newsletter" name="newsletter"/>
                     </div>
                   </div>
                   <div class="form-group">
@@ -439,37 +439,55 @@
                 <?php
                 include("connexion.php");
                 $msg = '';
+
+                function get_id_regime($regime){
+
+                  if($regime == "EXTERNAT"){
+
+                    $id_regime = 1;
+
+                  }
+                  else if($regime == "INTERNAT") {
+                     
+                    $id_regime = 2;
+                  }
+
+                  return $id_regime;
+                }
                 
                 if (isset($_POST["Valider"])){
                   // File upload path
-                $targetDir = "upload_admin/";
-                $fileName = basename($_FILES["file"]["name"]);
-                $targetFilePath = $targetDir . $fileName;
-                $fileType =pathinfo($targetFilePath, PATHINFO_EXTENSION);
+      
                   // get the admin input
                   $prenom = $_POST['prenom'];
                   $nom = $_POST['nom'];
-                  $login = $_POST['login'];
-                  $pass  = $_POST['password'];
-                  $allowtypes = array('jpg', 'png', 'jpeg');
-                  if(in_array($fileType, $allowtypes)){
-                    //upload file to server 
-                    if(move_uploaded_file($_FILES['file']['tmp_name'], $targetFilePath))
+                  $date= $_POST['date'];
+                  $prenom_pr  = $_POST['prenom_pr'];
+                  $nom_pr  = $_POST['nom_pr'];
+                  $tel =$_POST['tel'];
+                  $regime = $_POST['regime'];
+                  $id_regime = get_id_regime($regime);
 
-                    {
-                       $insert =$bdd->query("INSERT into user values(0,'$prenom', '$nom','$login', '$pass','$targetFilePath')");
+
+                  
+                    //upload file to server 
+                    $insert1 = $bdd-> query("INSERT into parents values(0, '$prenom_pr', '$nom_pr', '$tel')");
+                    $id_parent = $bdd -> lastinsertid();
+                  
+                      
+                       $insert =$bdd->query("INSERT into eleves values(0,'$prenom', '$nom','$date', '$id_parent','$id_regime')");
 
                        if($insert){
                          $msg = "<div class='alert alert-success'><b>Well done!</b>Administrateur ajouté </div>";
                        }
-                       else{ $msg= "<div class='alert alert-danger'>Echec de l erengistrement </div>";}
-                    }
-                    else{ $msg= "<div class='alert alert-danger'>Echec de l upload </div>";}
-                  }
-                  else { $msg = "<div class='alert alert-warning'><b>Warning!</b>seul les extension png, jpg, jpeg sont valident</div>";}
 
-                }
-                  echo $msg;
+                       else{ $msg= "<div class='alert alert-danger'>Echec de l erengistrement </div>";}
+                        
+                       echo $msg;
+
+                      }
+                      
+                  
                 ?>
               </div>
             </div>
